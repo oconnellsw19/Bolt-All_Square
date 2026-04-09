@@ -165,14 +165,14 @@ export function MySponsorshipsPage({ initialFilter = 'all' }: MySponsorshipsPage
             onClick={() => setFilter(tab.key)}
             className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
               filter === tab.key
-                ? 'bg-green-600 text-white border-green-600'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-green-400 hover:text-green-600'
+                ? 'bg-amber-500 text-white border-amber-500'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-amber-500 hover:text-amber-600'
             }`}
           >
             {tab.label}
             {counts[tab.key] > 0 && (
               <span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs ${
-                filter === tab.key ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600'
+                filter === tab.key ? 'bg-amber-400 text-white' : 'bg-gray-100 text-gray-600'
               }`}>
                 {counts[tab.key]}
               </span>
@@ -270,7 +270,7 @@ export function MySponsorshipsPage({ initialFilter = 'all' }: MySponsorshipsPage
                   {s.approval_message && showArtwork && (
                     <div className="mt-3 pt-3 border-t border-gray-100">
                       <p className="text-xs text-gray-500 mb-1">Message from course manager</p>
-                      <p className="text-sm text-gray-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+                      <p className="text-sm text-gray-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
                         {s.approval_message}
                       </p>
                     </div>

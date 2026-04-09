@@ -69,8 +69,8 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
       if (outingError) throw outingError;
 
       onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create outing');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create outing');
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
               required
               value={formData.course_id}
               onChange={(e) => setFormData({ ...formData, course_id: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
@@ -140,7 +140,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -152,7 +152,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -165,7 +165,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
               required
               value={formData.event_date}
               onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -182,7 +182,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
                 onChange={(e) =>
                   setFormData({ ...formData, registration_fee: parseFloat(e.target.value) || 0 })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -197,7 +197,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
                   setFormData({ ...formData, max_participants: parseInt(e.target.value) || 0 })
                 }
                 placeholder="Unlimited"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -213,7 +213,7 @@ export function CreateOutingModal({ onClose, onSuccess }: CreateOutingModalProps
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Outing'}
             </button>

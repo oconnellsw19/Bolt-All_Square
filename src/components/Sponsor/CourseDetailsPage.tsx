@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, MapPin, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, Mail, Globe } from 'lucide-react';
 import { SponsorshipBookingModal } from './SponsorshipBookingModal';
 
 interface Course {
@@ -28,6 +28,19 @@ interface AdvertisementType {
   name: string;
   description: string;
   dimensions: string;
+  is_hole_specific: boolean;
+  has_quantity_pricing: boolean;
+}
+
+interface QuantityTier {
+  id: string;
+  advertisement_type_id: string;
+  tier_name: string;
+  quantity: number;
+  daily_price: number;
+  weekly_price: number;
+  monthly_price: number;
+  annual_price: number;
 }
 
 interface CourseDetailsPageProps {
@@ -42,6 +55,8 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
   const [loading, setLoading] = useState(true);
   const [selectedHole, setSelectedHole] = useState<Hole | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [courseLevelBooking, setCourseLevelBooking] = useState(false);
+  const [quantityTiers, setQuantityTiers] = useState<QuantityTier[]>([]);
 
   useEffect(() => {
     loadCourseDetails();
@@ -82,6 +97,15 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
 
         setAdTypes(adTypesData || []);
       }
+
+      // Load quantity pricing tiers
+      const { data: quantityTiersData } = await supabase
+        .from('quantity_pricing_tiers')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('quantity');
+
+      setQuantityTiers(quantityTiersData || []);
     } catch (error) {
       console.error('Error loading course details:', error);
     } finally {
@@ -108,7 +132,7 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
         <p className="text-gray-600">Course not found</p>
         <button
           onClick={onBack}
-          className="mt-4 text-green-600 hover:text-green-700"
+          className="mt-4 text-amber-600 hover:text-amber-700"
         >
           Go back
         </button>
@@ -134,7 +158,7 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
             className="w-full h-64 object-cover"
           />
         ) : (
-          <div className="h-64 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+          <div className="h-64 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
             <MapPin size={96} className="text-white opacity-50" />
           </div>
         )}
@@ -181,7 +205,7 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
                 Available Advertisement Types
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {adTypes.map((adType) => (
+                {adTypes.filter((at) => at.is_hole_specific).map((adType) => (
                   <div
                     key={adType.id}
                     className="p-3 border border-gray-200 rounded-lg"
@@ -196,6 +220,76 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
         </div>
       </div>
 
+      {/* Course-Wide Advertisements */}
+      {adTypes.filter((at) => !at.is_hole_specific).length > 0 && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Course-Wide Sponsorships</h2>
+          <p className="text-gray-600 mb-6">
+            These sponsorship opportunities apply to the entire course
+          </p>
+          <div className="space-y-4">
+            {adTypes.filter((at) => !at.is_hole_specific).map((adType) => {
+              const adQuantityTiers = quantityTiers.filter((t) => t.advertisement_type_id === adType.id);
+
+              if (adType.has_quantity_pricing && adQuantityTiers.length > 0) {
+                return (
+                  <div key={adType.id} className="border-2 border-gray-200 rounded-lg p-5">
+                    <div className="flex items-start gap-3 mb-4">
+                      <Globe size={24} className="text-amber-500 flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-gray-800">{adType.name}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{adType.description}</p>
+                        <p className="text-xs text-gray-400 mt-1">{adType.dimensions}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700 mb-3">Select a package:</p>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {adQuantityTiers.map((tier) => (
+                        <button
+                          key={tier.id}
+                          onClick={() => {
+                            setCourseLevelBooking(true);
+                            setSelectedHole(null);
+                            setShowBookingModal(true);
+                          }}
+                          className="p-4 border-2 border-gray-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition text-left"
+                        >
+                          <p className="font-semibold text-gray-800">{tier.tier_name}</p>
+                          <p className="text-xs text-gray-500 mb-2">{tier.quantity} carts</p>
+                          <p className="text-amber-600 font-bold text-lg">${tier.monthly_price}<span className="text-xs text-gray-500 font-normal">/mo</span></p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <button
+                  key={adType.id}
+                  onClick={() => {
+                    setCourseLevelBooking(true);
+                    setSelectedHole(null);
+                    setShowBookingModal(true);
+                  }}
+                  className="w-full p-5 border-2 border-gray-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition text-left group"
+                >
+                  <div className="flex items-start gap-3">
+                    <Globe size={24} className="text-amber-500 flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold text-gray-800 group-hover:text-amber-700">{adType.name}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{adType.description}</p>
+                      <p className="text-xs text-gray-400 mt-2">{adType.dimensions}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Hole Sponsorships */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Select a Hole to Sponsor</h2>
         <p className="text-gray-600 mb-6">
@@ -219,7 +313,7 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition" />
                 </>
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-green-600 group-hover:from-green-600 group-hover:to-green-700 transition" />
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-800 group-hover:from-slate-800 group-hover:to-slate-900 transition" />
               )}
               <div className="relative flex flex-col items-center justify-center h-full text-white">
                 <span className="text-2xl font-bold">{hole.hole_number}</span>
@@ -232,19 +326,25 @@ export function CourseDetailsPage({ courseId, onBack }: CourseDetailsPageProps) 
         </div>
       </div>
 
-      {showBookingModal && selectedHole && (
+      {showBookingModal && (selectedHole || courseLevelBooking) && (
         <SponsorshipBookingModal
           courseId={courseId}
           courseName={course.name}
           hole={selectedHole}
-          advertisementTypes={adTypes}
+          advertisementTypes={courseLevelBooking
+            ? adTypes.filter((at) => !at.is_hole_specific)
+            : adTypes.filter((at) => at.is_hole_specific)
+          }
+          quantityTiers={quantityTiers}
           onClose={() => {
             setShowBookingModal(false);
             setSelectedHole(null);
+            setCourseLevelBooking(false);
           }}
           onSuccess={() => {
             setShowBookingModal(false);
             setSelectedHole(null);
+            setCourseLevelBooking(false);
           }}
         />
       )}

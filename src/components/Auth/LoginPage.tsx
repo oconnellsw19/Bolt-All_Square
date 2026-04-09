@@ -20,18 +20,18 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
 
     try {
       await signIn(email, password);
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-800 mb-2">All Square</h1>
+          <h1 className="text-3xl font-bold italic text-amber-500 mb-2">All Square</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
 
@@ -52,7 +52,7 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -66,14 +66,14 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <LogIn size={20} />
             {loading ? 'Signing in...' : 'Sign In'}
@@ -83,7 +83,7 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
         <div className="mt-6 text-center">
           <button
             onClick={onSwitchToRegister}
-            className="text-green-600 hover:text-green-700 text-sm"
+            className="text-amber-500 hover:text-amber-600 text-sm"
           >
             Don't have an account? Sign up
           </button>

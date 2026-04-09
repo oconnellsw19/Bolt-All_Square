@@ -30,18 +30,18 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
         company_name: companyName || null,
         phone: phone || null,
       });
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-800 mb-2">All Square</h1>
+          <h1 className="text-3xl font-bold italic text-amber-500 mb-2">All Square</h1>
           <p className="text-gray-600">Create your account</p>
         </div>
 
@@ -62,7 +62,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
                 onClick={() => setRole('sponsor')}
                 className={`py-2 px-4 rounded-lg border-2 transition ${
                   role === 'sponsor'
-                    ? 'border-green-600 bg-green-50 text-green-700'
+                    ? 'border-amber-500 bg-amber-50 text-amber-700'
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
@@ -73,7 +73,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
                 onClick={() => setRole('course_manager')}
                 className={`py-2 px-4 rounded-lg border-2 transition ${
                   role === 'course_manager'
-                    ? 'border-green-600 bg-green-50 text-green-700'
+                    ? 'border-amber-500 bg-amber-50 text-amber-700'
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
@@ -92,7 +92,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -106,7 +106,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           )}
@@ -120,7 +120,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -134,7 +134,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -149,14 +149,14 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <UserPlus size={20} />
             {loading ? 'Creating account...' : 'Create Account'}
@@ -166,7 +166,7 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
         <div className="mt-6 text-center">
           <button
             onClick={onSwitchToLogin}
-            className="text-green-600 hover:text-green-700 text-sm"
+            className="text-amber-500 hover:text-amber-600 text-sm"
           >
             Already have an account? Sign in
           </button>

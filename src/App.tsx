@@ -13,6 +13,9 @@ import { MarketplacePage } from './components/Sponsor/MarketplacePage';
 import { CourseDetailsPage } from './components/Sponsor/CourseDetailsPage';
 import { MySponsorshipsPage } from './components/Sponsor/MySponsorshipsPage';
 import { AdminDashboard } from './components/Admin/AdminDashboard';
+import { AdminCoursesPage } from './components/Admin/AdminCoursesPage';
+import { AdminSponsorshipsPage } from './components/Admin/AdminSponsorshipsPage';
+import { AdminUsersPage } from './components/Admin/AdminUsersPage';
 
 function AppContent() {
   const { user, profile, loading } = useAuth();
@@ -97,15 +100,17 @@ function AppContent() {
     } else if (profile.role === 'admin') {
       switch (currentView) {
         case 'dashboard':
-          return <AdminDashboard />;
+          return <AdminDashboard onNavigate={setCurrentView} />;
+        case 'analytics':
+          return <AdminDashboard onNavigate={setCurrentView} />;
+        case 'courses':
+          return <AdminCoursesPage />;
         case 'sponsorships':
-          return <div className="text-gray-600">Sponsorships management coming soon</div>;
-        case 'advertisements':
-          return <div className="text-gray-600">Advertisement management coming soon</div>;
-        case 'settings':
-          return <div className="text-gray-600">Settings coming soon</div>;
+          return <AdminSponsorshipsPage />;
+        case 'users':
+          return <AdminUsersPage />;
         default:
-          return <AdminDashboard />;
+          return <AdminDashboard onNavigate={setCurrentView} />;
       }
     }
 

@@ -15,7 +15,7 @@ interface Outing {
   courses: {
     name: string;
   };
-  registrations?: { count: number }[];
+  registrationCount?: number;
 }
 
 export function OutingsPage() {
@@ -90,7 +90,7 @@ export function OutingsPage() {
         <h2 className="text-2xl font-bold text-gray-800">Outing Events</h2>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+          className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition flex items-center gap-2"
         >
           <Plus size={20} />
           Create Outing
@@ -106,16 +106,16 @@ export function OutingsPage() {
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+            className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition"
           >
             Create Your First Outing
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {outings.map((outing: any) => (
+          {outings.map((outing) => (
             <div key={outing.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-              <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <div className="h-32 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
                 <Calendar size={64} className="text-white opacity-50" />
               </div>
               <div className="p-6">

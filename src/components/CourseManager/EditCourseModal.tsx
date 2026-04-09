@@ -139,8 +139,8 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
 
       await supabase.from('courses').update({ cover_photo_url: url }).eq('id', courseId);
       setCoverPhotoUrl(url);
-    } catch (err: any) {
-      setError('Failed to upload cover photo: ' + (err.message || err));
+    } catch (err) {
+      setError('Failed to upload cover photo: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setCoverPhotoUploading(false);
     }
@@ -151,7 +151,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
     try {
       await supabase.from('courses').update({ cover_photo_url: null }).eq('id', courseId);
       setCoverPhotoUrl(null);
-    } catch (err: any) {
+    } catch {
       setError('Failed to remove cover photo');
     }
   };
@@ -171,8 +171,8 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
       setHoles((prev) =>
         prev.map((h) => (h.id === holeId ? { ...h, photo_url: url } : h))
       );
-    } catch (err: any) {
-      setError('Failed to upload hole photo: ' + (err.message || err));
+    } catch (err) {
+      setError('Failed to upload hole photo: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setHolePhotoUploading(null);
     }
@@ -185,7 +185,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
       setHoles((prev) =>
         prev.map((h) => (h.id === holeId ? { ...h, photo_url: null } : h))
       );
-    } catch (err: any) {
+    } catch {
       setError('Failed to remove hole photo');
     }
   };
@@ -224,8 +224,8 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
       }
 
       onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Failed to update course');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update course');
     } finally {
       setLoading(false);
     }
@@ -283,17 +283,17 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                   type="button"
                   onClick={() => coverPhotoInputRef.current?.click()}
                   disabled={coverPhotoUploading}
-                  className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-green-400 hover:bg-green-50 transition group"
+                  className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-amber-400 hover:bg-amber-50 transition group"
                 >
                   {coverPhotoUploading ? (
                     <>
-                      <Loader2 size={32} className="text-green-500 animate-spin" />
+                      <Loader2 size={32} className="text-amber-500 animate-spin" />
                       <span className="text-sm text-gray-500">Uploading...</span>
                     </>
                   ) : (
                     <>
-                      <ImageIcon size={32} className="text-gray-400 group-hover:text-green-500 transition" />
-                      <span className="text-sm font-medium text-gray-600 group-hover:text-green-600 transition">
+                      <ImageIcon size={32} className="text-gray-400 group-hover:text-amber-500 transition" />
+                      <span className="text-sm font-medium text-gray-600 group-hover:text-amber-600 transition">
                         Upload cover photo
                       </span>
                       <span className="text-xs text-gray-400">JPG, PNG, or WebP up to 10MB</span>
@@ -321,7 +321,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -333,7 +333,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -359,7 +359,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                 type="email"
                 value={formData.contact_email}
                 onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -370,7 +370,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                 type="tel"
                 value={formData.contact_phone}
                 onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -383,7 +383,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
               type="text"
               value={formData.address_line1}
               onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -395,7 +395,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
               type="text"
               value={formData.address_line2}
               onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -406,7 +406,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -415,7 +415,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                 type="text"
                 value={formData.state}
                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -424,7 +424,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                 type="text"
                 value={formData.zip_code}
                 onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -477,14 +477,14 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
                           type="button"
                           onClick={() => holePhotoInputRefs.current[hole.id]?.click()}
                           disabled={holePhotoUploading === hole.id}
-                          className="w-full h-28 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-1 hover:border-green-400 hover:bg-green-50 transition group/btn"
+                          className="w-full h-28 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-1 hover:border-amber-400 hover:bg-amber-50 transition group/btn"
                         >
                           {holePhotoUploading === hole.id ? (
-                            <Loader2 size={20} className="text-green-500 animate-spin" />
+                            <Loader2 size={20} className="text-amber-500 animate-spin" />
                           ) : (
                             <>
-                              <ImageIcon size={20} className="text-gray-400 group-hover/btn:text-green-500 transition" />
-                              <span className="text-xs text-gray-400 group-hover/btn:text-green-600 transition">
+                              <ImageIcon size={20} className="text-gray-400 group-hover/btn:text-amber-500 transition" />
+                              <span className="text-xs text-gray-400 group-hover/btn:text-amber-600 transition">
                                 Add photo
                               </span>
                             </>
@@ -545,7 +545,7 @@ export function EditCourseModal({ courseId, onClose, onSuccess }: EditCourseModa
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>

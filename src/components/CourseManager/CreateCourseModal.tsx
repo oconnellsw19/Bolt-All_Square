@@ -98,8 +98,8 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
       }
 
       onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create course');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create course');
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -144,7 +144,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -155,7 +155,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
             <select
               value={formData.total_holes}
               onChange={(e) => setFormData({ ...formData, total_holes: parseInt(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               <option value={9}>9 holes</option>
               <option value={18}>18 holes</option>
@@ -171,7 +171,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
                 type="email"
                 value={formData.contact_email}
                 onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -182,7 +182,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
                 type="tel"
                 value={formData.contact_phone}
                 onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
               type="text"
               value={formData.address_line1}
               onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -207,7 +207,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
               type="text"
               value={formData.address_line2}
               onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -220,7 +220,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -231,7 +231,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
                 type="text"
                 value={formData.state}
                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -242,7 +242,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
                 type="text"
                 value={formData.zip_code}
                 onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -286,7 +286,7 @@ export function CreateCourseModal({ onClose, onSuccess }: CreateCourseModalProps
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Course'}
             </button>

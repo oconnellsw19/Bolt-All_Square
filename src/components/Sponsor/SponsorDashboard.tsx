@@ -71,7 +71,7 @@ export function SponsorDashboard({ onNavigate }: SponsorDashboardProps) {
       label: 'Active Sponsorships',
       value: stats.activeSponsorships,
       icon: CheckCircle,
-      color: 'bg-green-500',
+      color: 'bg-amber-500',
       filter: 'active',
     },
     {
@@ -92,7 +92,7 @@ export function SponsorDashboard({ onNavigate }: SponsorDashboardProps) {
       label: 'Total Spent',
       value: `$${stats.totalSpent.toFixed(2)}`,
       icon: DollarSign,
-      color: 'bg-green-600',
+      color: 'bg-amber-600',
       filter: 'all',
     },
   ];
@@ -129,14 +129,14 @@ export function SponsorDashboard({ onNavigate }: SponsorDashboardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={() => onNavigate?.('marketplace')}
-            className="p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition text-left"
+            className="p-4 border-2 border-gray-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition text-left"
           >
             <h4 className="font-medium text-gray-800 mb-1">Find Golf Courses</h4>
             <p className="text-sm text-gray-600">Browse available sponsorship opportunities</p>
           </button>
           <button
             onClick={() => onNavigate?.('my-sponsorships')}
-            className="p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition text-left"
+            className="p-4 border-2 border-gray-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition text-left"
           >
             <h4 className="font-medium text-gray-800 mb-1">View My Sponsorships</h4>
             <p className="text-sm text-gray-600">Manage your active and pending sponsorships</p>

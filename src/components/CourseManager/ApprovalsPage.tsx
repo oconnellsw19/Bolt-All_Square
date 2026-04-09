@@ -62,62 +62,67 @@ export function ApprovalsPage() {
         .select('id')
         .eq('manager_id', profile?.id);
 
-      console.log('Courses:', courses, 'Error:', coursesError);
-
       const courseIds = courses?.map((c) => c.id) || [];
 
       if (courseIds.length === 0) {
-        console.log('No courses found for manager');
         setSponsorships([]);
         setLoading(false);
         return;
       }
 
-      const { data: holes, error: holesError } = await supabase
+      const { data: holes } = await supabase
         .from('holes')
         .select('id')
         .in('course_id', courseIds);
 
-      console.log('Holes:', holes, 'Error:', holesError);
-
       const holeIds = holes?.map((h) => h.id) || [];
 
-      if (holeIds.length === 0) {
-        console.log('No holes found for courses');
-        setSponsorships([]);
-        setLoading(false);
-        return;
+      // Fetch hole-level pending sponsorships
+      let holeSponsorships: Sponsorship[] = [];
+      if (holeIds.length > 0) {
+        const { data, error } = await supabase
+          .from('sponsorships')
+          .select(`
+            *,
+            sponsor:profiles!sponsorships_sponsor_id_fkey(full_name, company_name),
+            hole:holes!sponsorships_hole_id_fkey(
+              hole_number,
+              hole_name,
+              course:courses!holes_course_id_fkey(name)
+            ),
+            advertisement_type:advertisement_types!sponsorships_advertisement_type_id_fkey(name, description),
+            artwork(id, file_url, file_name, file_type, mime_type, created_at)
+          `)
+          .in('hole_id', holeIds)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        holeSponsorships = data || [];
       }
 
-      const { data, error } = await supabase
+      // Fetch course-level pending sponsorships
+      const { data: courseData, error: courseError } = await supabase
         .from('sponsorships')
         .select(`
           *,
           sponsor:profiles!sponsorships_sponsor_id_fkey(full_name, company_name),
-          hole:holes!sponsorships_hole_id_fkey(
-            hole_number,
-            hole_name,
-            course:courses!holes_course_id_fkey(name)
-          ),
           advertisement_type:advertisement_types!sponsorships_advertisement_type_id_fkey(name, description),
           artwork(id, file_url, file_name, file_type, mime_type, created_at)
         `)
-        .in('hole_id', holeIds)
+        .in('course_id', courseIds)
+        .is('hole_id', null)
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
-      console.log('Sponsorships query result:', { data, error, holeIds });
+      if (courseError) throw courseError;
+      const courseSponsorships = (courseData || []).map((s: any) => ({ ...s, hole: null }));
 
-      if (error) {
-        console.error('Query error details:', error);
-        throw error;
-      }
-
-      if (data && data.length > 0) {
-        console.log('First sponsorship structure:', JSON.stringify(data[0], null, 2));
-      }
-
-      setSponsorships(data || []);
+      // Merge and sort
+      const all = [...holeSponsorships, ...courseSponsorships].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setSponsorships(all);
     } catch (error) {
       console.error('Error loading sponsorships:', error);
     } finally {
@@ -130,8 +135,6 @@ export function ApprovalsPage() {
 
     setProcessing(true);
     try {
-      console.log('Attempting to approve sponsorship:', selectedSponsorship.id);
-
       const { data, error } = await supabase
         .from('sponsorships')
         .update({
@@ -142,20 +145,13 @@ export function ApprovalsPage() {
         .eq('id', selectedSponsorship.id)
         .select();
 
-      console.log('Update result:', { data, error });
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data || data.length === 0) {
-        console.error('No rows were updated');
         alert('Failed to approve sponsorship. You may not have permission to update this sponsorship.');
         return;
       }
 
-      console.log('Successfully approved sponsorship');
       setShowApprovalModal(false);
       setApprovalMessage('');
       setSelectedSponsorship(null);
@@ -178,8 +174,6 @@ export function ApprovalsPage() {
 
     setProcessing(true);
     try {
-      console.log('Attempting to deny sponsorship:', selectedSponsorship.id);
-
       const { data, error } = await supabase
         .from('sponsorships')
         .update({
@@ -190,20 +184,13 @@ export function ApprovalsPage() {
         .eq('id', selectedSponsorship.id)
         .select();
 
-      console.log('Deny update result:', { data, error });
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data || data.length === 0) {
-        console.error('No rows were updated');
         alert('Failed to deny sponsorship. You may not have permission to update this sponsorship.');
         return;
       }
 
-      console.log('Successfully denied sponsorship');
       setShowApprovalModal(false);
       setDenialReason('');
       setSelectedSponsorship(null);
@@ -248,18 +235,11 @@ export function ApprovalsPage() {
       ) : (
         <div className="space-y-4">
           {sponsorships.map((sponsorship) => {
-            console.log('Rendering sponsorship:', {
-              id: sponsorship.id,
-              hasHole: !!sponsorship.hole,
-              hasSponsor: !!sponsorship.sponsor,
-              hasAdType: !!sponsorship.advertisement_type,
-              sponsorship
-            });
-
-            const hole = sponsorship.hole || {};
-            const sponsor = sponsorship.sponsor || {};
-            const adType = sponsorship.advertisement_type || {};
-            const course = hole.course || {};
+            const hole = sponsorship.hole || null;
+            const sponsor = sponsorship.sponsor || { full_name: '', company_name: '' };
+            const adType = sponsorship.advertisement_type || { name: '', description: '' };
+            const course = hole?.course || { name: '' };
+            const isCourseWide = !sponsorship.hole_id;
 
             return (
               <div key={sponsorship.id} className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -267,8 +247,10 @@ export function ApprovalsPage() {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-xl font-bold text-gray-800 mb-1">
-                        {course.name || 'Unknown Course'} - Hole {hole.hole_number || 'N/A'}
-                        {hole.hole_name && (
+                        {isCourseWide
+                          ? 'Course-Wide Sponsorship'
+                          : `${course.name || 'Course'} - Hole ${hole?.hole_number || 'N/A'}`}
+                        {hole?.hole_name && (
                           <span className="font-normal ml-2">({hole.hole_name})</span>
                         )}
                       </h3>
@@ -285,44 +267,56 @@ export function ApprovalsPage() {
                     <div>
                       <p className="text-sm text-gray-600">Sponsor</p>
                       <p className="font-medium text-gray-800">
-                        {sponsor.company_name || sponsor.full_name || 'Unknown Sponsor'}
+                        {sponsor?.company_name || sponsor?.full_name || 'Unknown Sponsor'}
                       </p>
                     </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Duration</p>
-                    <p className="font-medium text-gray-800">
-                      {new Date(sponsorship.start_date).toLocaleDateString()} -{' '}
-                      {new Date(sponsorship.end_date).toLocaleDateString()}
-                    </p>
+                    <div>
+                      <p className="text-sm text-gray-600">Duration</p>
+                      <p className="font-medium text-gray-800">
+                        {new Date(sponsorship.start_date).toLocaleDateString()} -{' '}
+                        {new Date(sponsorship.end_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Type</p>
+                      <p className="font-medium text-gray-800 capitalize">{sponsorship.duration_type}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Total Amount</p>
+                      <p className="font-medium text-gray-800">${Number(sponsorship.total_amount).toFixed(2)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Type</p>
-                    <p className="font-medium text-gray-800 capitalize">{sponsorship.duration_type}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Total Amount</p>
-                    <p className="font-medium text-gray-800">${sponsorship.total_amount.toFixed(2)}</p>
-                  </div>
-                </div>
 
                 {sponsorship.artwork.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Uploaded Files</p>
-                    <div className="flex flex-wrap gap-2">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Submitted Ad Image{sponsorship.artwork.length > 1 ? 's' : ''}</p>
+                    <div className="flex flex-wrap gap-3">
                       {sponsorship.artwork.map((file) => (
                         <a
                           key={file.id}
                           href={file.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                          className="group block"
                         >
                           {file.mime_type?.startsWith('image/') ? (
-                            <Image size={16} className="text-gray-600" />
+                            <div className="relative">
+                              <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-gray-200 group-hover:border-amber-400 transition bg-white">
+                                <img
+                                  src={file.file_url}
+                                  alt={file.file_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1 truncate max-w-[128px]">{file.file_name}</p>
+                            </div>
                           ) : (
-                            <FileText size={16} className="text-gray-600" />
+                            <div className="w-32 h-32 rounded-lg border-2 border-gray-200 group-hover:border-amber-400 transition bg-gray-50 flex flex-col items-center justify-center p-2">
+                              <FileText size={28} className="text-gray-400 mb-1" />
+                              <p className="text-xs text-gray-500 text-center truncate max-w-[112px]">{file.file_name}</p>
+                              <p className="text-[10px] text-amber-600 mt-1">View PDF</p>
+                            </div>
                           )}
-                          <span className="text-sm text-gray-700">{file.file_name}</span>
                         </a>
                       ))}
                     </div>
@@ -332,7 +326,7 @@ export function ApprovalsPage() {
                 <div className="flex gap-3 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => openApprovalModal(sponsorship, 'approve')}
-                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+                    className="flex-1 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition flex items-center justify-center gap-2"
                   >
                     <CheckCircle size={20} />
                     Approve
@@ -366,7 +360,9 @@ export function ApprovalsPage() {
               </p>
               <p className="text-sm text-gray-600 mb-1">Details</p>
               <p className="font-medium text-gray-800">
-                {selectedSponsorship.hole?.course?.name || 'Unknown Course'} - Hole {selectedSponsorship.hole?.hole_number || 'N/A'}
+                {selectedSponsorship.hole
+                  ? `${selectedSponsorship.hole.course?.name || 'Course'} - Hole ${selectedSponsorship.hole.hole_number}`
+                  : 'Course-Wide Sponsorship'}
               </p>
             </div>
 
@@ -380,7 +376,7 @@ export function ApprovalsPage() {
                   onChange={(e) => setApprovalMessage(e.target.value)}
                   rows={4}
                   placeholder="Add a message to send with the approval..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   This message will be visible to the sponsor
@@ -423,7 +419,7 @@ export function ApprovalsPage() {
                 disabled={processing}
                 className={`flex-1 px-4 py-2 text-white rounded-lg transition disabled:opacity-50 ${
                   actionType === 'approve'
-                    ? 'bg-green-600 hover:bg-green-700'
+                    ? 'bg-amber-500 hover:bg-amber-600'
                     : 'bg-red-600 hover:bg-red-700'
                 }`}
               >

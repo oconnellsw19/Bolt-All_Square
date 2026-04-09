@@ -101,7 +101,7 @@ export function CoursesPage() {
         <h2 className="text-2xl font-bold text-gray-800">My Courses</h2>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+          className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition flex items-center gap-2"
         >
           <Plus size={20} />
           Add Course
@@ -117,7 +117,7 @@ export function CoursesPage() {
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+            className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition"
           >
             Add Your First Course
           </button>
@@ -126,7 +126,7 @@ export function CoursesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
             <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-              <div className="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+              <div className="h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
                 <MapPin size={64} className="text-white opacity-50" />
               </div>
               <div className="p-6">
@@ -140,7 +140,7 @@ export function CoursesPage() {
                 <div className="space-y-2">
                   <button
                     onClick={() => setViewingCourse(course)}
-                    className="w-full bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+                    className="w-full bg-amber-500 text-white px-3 py-2 rounded-lg hover:bg-amber-600 transition flex items-center justify-center gap-2"
                   >
                     <Eye size={16} />
                     View Holes & Pricing

@@ -79,7 +79,7 @@ export function MarketplacePage({ onViewCourse }: MarketplacePageProps) {
           placeholder="Search by course name, city, state, or zip code..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
         />
       </div>
 
@@ -100,7 +100,7 @@ export function MarketplacePage({ onViewCourse }: MarketplacePageProps) {
               key={course.id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
             >
-              <div className="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+              <div className="h-48 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
                 <MapPin size={64} className="text-white opacity-50" />
               </div>
               <div className="p-6">
@@ -138,7 +138,7 @@ export function MarketplacePage({ onViewCourse }: MarketplacePageProps) {
                 )}
                 <button
                   onClick={() => onViewCourse?.(course.id)}
-                  className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                  className="w-full bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition"
                 >
                   View Sponsorship Options
                 </button>
